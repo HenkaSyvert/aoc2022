@@ -265,11 +265,199 @@ void day4part2() {
 	cout << totalOverlaps;
 }
 
+void day5part1() {
+
+
+	vector<vector<char>> stacks;	// detta är onödigt men nu är den potentielly dynamisk iaf :)
+
+	ifstream input;
+	input.open("input/day5.txt");
+
+	bool initStack = false;
+
+	string line;
+	while (getline(input, line)) {
+
+		if (!initStack) {
+			int numOfStacks = (line.size() + 1) / 4;
+			for (int i = 0; i < numOfStacks; i++)
+				stacks.push_back(vector<char>());
+			initStack = true;
+			//cout << numOfStacks;
+		}
+
+		if (line[1] == '1') break;
+
+		for (int i = 0; i < (line.size()+1) / 4; i++) {
+			if (line[i * 4] == '[') stacks[i].push_back(line[i * 4 + 1]);
+		}
+
+
+	}
+
+	getline(input, line); //discard empty line
+	/*
+	for (auto s : stacks) {
+		for (auto c : s) cout << c;
+		cout << endl;
+	}*/
+	for (auto& s : stacks) reverse(s.begin(), s.end());
+	/*for (auto s : stacks) {
+		for (auto c : s) cout << c;
+		cout << endl;
+	}*/
+
+	while (getline(input, line)) {
+
+		int count, src, dst;
+		sscanf(line.c_str(), "move %d from %d to %d ", &count, &src, &dst);
+		//printf("move %d from %d to %d\n", count, src, dst);
+		//getchar();
+
+		for (int i = 0; i < count; i++) {
+			stacks[dst - 1].push_back(stacks[src - 1].back());
+			//cout << stacks[src - 1].back() << endl;
+			//getchar();
+			stacks[src - 1].pop_back();
+
+		}
+		//for (auto c : stacks[dst - 1])cout << c;
+
+	}
+
+	string result;
+	for (auto s : stacks)result += s.back();
+	cout << result;
+
+
+
+}
+
+void day5part2() {
+
+	vector<vector<char>> stacks;
+
+	ifstream input;
+	input.open("input/day5.txt");
+
+	bool initStack = false;
+
+	string line;
+	while (getline(input, line)) {
+
+		if (!initStack) {
+			int numOfStacks = (line.size() + 1) / 4;
+			for (int i = 0; i < numOfStacks; i++)
+				stacks.push_back(vector<char>());
+			initStack = true;
+		}
+
+		if (line[1] == '1') break;
+
+		for (int i = 0; i < (line.size() + 1) / 4; i++) {
+			if (line[i * 4] == '[') stacks[i].push_back(line[i * 4 + 1]);
+		}
+
+
+	}
+
+	getline(input, line);
+	for (auto& s : stacks) reverse(s.begin(), s.end());
+
+	while (getline(input, line)) {
+
+		int count, src, dst;
+		sscanf(line.c_str(), "move %d from %d to %d ", &count, &src, &dst);
+
+		for (int i = count; i > 0; i--) {
+			stacks[dst - 1].push_back(stacks[src - 1][stacks[src - 1].size() - i]);
+		}
+		for (int i = 0; i < count; i++) stacks[src - 1].pop_back();
+
+		//for (auto c : stacks[dst - 1])cout << c << endl;
+		//getchar();
+		
+	}
+
+	string result;
+	for (auto s : stacks)result += s.back();
+	cout << result;
+
+
+
+}
+
+void day6part1() {
+
+	FILE* f = fopen("input/day6.txt", "r");
+	
+	char buf[5] = "1234";
+	buf[3] = getc(f);
+	buf[2] = getc(f);
+	buf[1] = getc(f);
+	int index = 4;
+	while ((buf[0] = getc(f)) != EOF) {
+
+		//cout << buf << endl;
+		//getchar();
+		for (int i = 0; i < 3; i++) 
+			if (buf[0] == buf[1+i]) goto notFound;
+		
+		for (int i = 0; i < 2; i++)
+			if (buf[1] == buf[2 + i]) goto notFound;
+
+		if (buf[2] == buf[3]) goto notFound;
+
+		// found
+		cout << buf << endl;
+		cout << index;
+		break;
+
+	notFound:
+		//cout << index << endl;
+		index++;
+		memcpy(buf + 1, buf, 3);
+	}
+
+	fclose(f);
+}
+
+void day6part2() {
+
+	FILE* f = fopen("input/day6.txt", "r");
+
+	char buf[15] = {'\0'};
+	int index = 14;
+	for (int i = 1; i < 14; i++) buf[i] = getc(f);	// reverse order but does not matter
+
+	while ((buf[0] = getc(f)) != EOF) {
+
+		//cout << buf << endl;
+		//getchar();
+
+		for (int i = 0; i < 13; i++) {
+			for (int j = i + 1; j < 14; j++)
+				if (buf[i] == buf[j]) goto notFound;
+		}
+
+		// found
+		cout << index;
+		break;
+
+
+	notFound:
+		memcpy(buf + 1, buf, 13);
+		index++;
+	}
+
+	fclose(f);
+}
+
 
 
 int main() {
 
-	day4part2();
+	day6part2();
 
 	return 0;
 }
