@@ -455,9 +455,144 @@ void day6part2() {
 
 
 
+struct Node {
+	static vector<Node*> instances;
+	string name;
+	Node* parent = nullptr;
+	vector<Node*> children;
+	int size = 0;
+
+	Node(string n, Node* p) { parent = p, name = n; instances.push_back(this); }
+};
+vector<Node*> Node::instances;
+
+void day7part1() {
+
+	
+
+	ifstream input;
+	input.open("input/day7.txt");
+
+	Node* currDir = new Node("/", nullptr);
+	string line;
+	getline(input, line);//discard first
+
+	while (getline(input, line)) {
+
+		if (line[0] == '$') {
+			if (line[2] == 'c') {	// $ cd
+				if (line[5] == '.') {	// $ cd ..
+
+					currDir->parent->size += currDir->size;
+					currDir = currDir->parent;
+					//cout << "cd .. = " << currDir->name << endl;
+
+				}
+				else {	// cd <some-dir>
+
+					for (auto n : currDir->children)
+						if (line.substr(5, line.size() - 5) == n->name)
+							currDir = n;// , cout << "change dir to " << n->name << endl;
+					
+
+				}
+			}
+			else {	// $ ls
+				continue;
+			}
+		}
+		else if ('0' <= line[0] && line[0] <= '9') {
+			int size;
+			sscanf(line.c_str(), "%d", &size);
+			currDir->size += size;
+			//cout << "add file size of " << size << " to currDir = " << currDir->name << endl;
+		}
+		else {	// dir
+			string dirName = line.substr(4, line.size() - 4);
+			currDir->children.push_back(new Node(dirName, currDir));
+			//cout << "add new node: " << dirName << " to " << currDir->name << endl;
+		}
+
+		//getchar();
+
+	}
+
+	int sizeSum = 0;
+	for (auto c : Node::instances) if (c->size <= 100000) sizeSum += c->size;
+	cout << sizeSum;
+
+}
+
+void day7part2() {
+
+
+
+	ifstream input;
+	input.open("input/day7.txt");
+
+	Node* currDir = new Node("/", nullptr);
+	string line;
+	getline(input, line);//discard first
+
+	while (getline(input, line)) {
+
+		if (line[0] == '$') {
+			if (line[2] == 'c') {	// $ cd
+				if (line[5] == '.') {	// $ cd ..
+
+					currDir->parent->size += currDir->size;
+					currDir = currDir->parent;
+					//cout << "cd .. = " << currDir->name << endl;
+
+				}
+				else {	// cd <some-dir>
+
+					for (auto n : currDir->children)
+						if (line.substr(5, line.size() - 5) == n->name)
+							currDir = n;// , cout << "change dir to " << n->name << endl;
+
+
+				}
+			}
+			else {	// $ ls
+				continue;
+			}
+		}
+		else if ('0' <= line[0] && line[0] <= '9') {
+			int size;
+			sscanf(line.c_str(), "%d", &size);
+			currDir->size += size;
+			//cout << "add file size of " << size << " to currDir = " << currDir->name << endl;
+		}
+		else {	// dir
+			string dirName = line.substr(4, line.size() - 4);
+			currDir->children.push_back(new Node(dirName, currDir));
+			//cout << "add new node: " << dirName << " to " << currDir->name << endl;
+		}
+
+		//getchar();
+		//cout << currDir->name << endl;
+
+	}
+
+	int usedSpace = Node::instances[0]->size;	// had to add 2 '$ cd ..' to input to make this work :) :) 
+	int freeSpace = 70000000 - usedSpace;
+	int neededSpace = 30000000 - freeSpace;
+
+	sort(Node::instances.begin(), Node::instances.end(), [](Node* a, Node* b) {return a->size < b->size; });
+	//for (auto c : Node::instances) cout << c->size << endl;
+	for (auto c : Node::instances) 
+		if (c->size >= neededSpace) {
+			cout << c->size;
+			break;
+	}
+
+}
+
+
 int main() {
 
-	day6part2();
+	day7part2();
 
 	return 0;
 }
